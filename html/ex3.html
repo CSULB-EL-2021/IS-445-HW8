@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emile's Ex.3</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <h1><a href="../index.html">Link to Start Page</a></h1>
+    <h2>Emile's Ex.3</h2>
+
+    <hr>
+
+    <h1>Visited Countries Form</h1>
+
+    <div id="app">
+        <form>
+            <label for="name">My name:</label>
+            <input v-model="form.name" id="name" type="text" placeholder="My name" class="block">
+
+            <p>Countries:</p>
+            <ul v-for="(country, index) in form.countries" :key="index" class="space-x-2">
+                <li>
+                    <input v-model="country.name" type="text" placeholder="Country names">
+                    <input v-model="country.year" type="number" placeholder="Year of visit">
+                    <button v-if="form.countries.length === index + 1" @click.prevent="addCountry">+</button>
+                    <button v-if="form.countries.length > 1" @click.prevent="removeCountry(index)">-</button>
+                </li>
+            </ul>
+
+            <button @click.prevent="submit">Submit</button>
+        </form>
+    </div>
+
+    <script src="../js/ex3.js"></script>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script>
+        Vue.createApp({
+            data() {
+                return {
+                    form: {
+                        name: '',
+                        countries: [{name: '', year: null}]
+                    }
+                }
+            },
+            methods: {
+                addCountry() {
+                    this.form.countries.push({name: '', year: null});
+                },
+                removeCountry(index) {
+                    this.form.countries.splice(index, 1);
+                },
+                submit() {
+                    fetch('https://thejsway-server.herokuapp.com/api/countries', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(this.form)
+                    })
+                    .catch(error => console.error(error))
+                    .then(response => response.text())
+                    .then(data => console.log(data))
+                }
+            }
+        }).mount('#app')
+    </script>
+
+</body>
+</html>
